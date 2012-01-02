@@ -3,6 +3,11 @@
 # Quick and dirty way to parse out a bunch of tweet sized
 # strings from our corpus.
 
+require "rubygems"
+require "bundler/setup"
+require "sequel"
+require "./db_connect.rb"
+
 def fixit(sentence)
   while ['”','’','‘','—',')',','].include?(sentence[0])
     sentence = sentence[1,sentence.size-1]
@@ -63,9 +68,13 @@ end
 
 rejected = more_rejects
 
+DB = Sequel.connect("mysql2://#{DB_USER}:#{DB_PASSWORD}@localhost/stungeye")
+sentences = DB[:sentences]
+
 open('sentences.txt', 'w:UTF-8') do |file|
   accepted.each do |sentence|
-    file.puts "#{sentence} (#{sentence.size})"
+    # file.puts "#{sentence} (#{sentence.size})"
+    sentences.insert( :words => sentence, :length => sentence.size )
   end
 end
 

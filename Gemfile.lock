@@ -5,6 +5,7 @@ GEM
       twitter_oauth
     json (1.6.3)
     mime-types (1.17.2)
+    mysql2 (0.3.11)
     oauth (0.4.5)
     sequel (3.30.0)
     twitter_oauth (0.4.3)
@@ -17,4 +18,5 @@ PLATFORMS
 
 DEPENDENCIES
   chatterbot
+  mysql2
   sequel
