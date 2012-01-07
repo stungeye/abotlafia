@@ -29,6 +29,8 @@ def fixit(sentence)
   sentence
 end
 
+characters = /Diotallevi|Jacopo|Belbo|Casaubon|Gudrun|Aglie|Garamond|Lorenza|Salon|Ardenti|Bramanti/i
+
 # Read the entire file into a single string, ensure that line-ending
 # are padding with extra spaces.
 
@@ -49,7 +51,7 @@ rejected = []
 corpus.split('.').map{ |s| s.strip }.select{ |s| s.size > 0 }.each do |sentence|
   sentence += '.'
   sentence = fixit(sentence)
-  accepted << sentence  if sentence.size > 15 && sentence.size <= 140
+  accepted << sentence  if sentence.size > 15 && sentence.size <= 140 && !sentence.match(characters)
   rejected << sentence  if sentence.size > 140
 end
 
@@ -61,7 +63,7 @@ rejected.each do |reject|
   reject.split('?').map{|s| s.strip }.select{ |s| s.size > 0 }.each do |sentence|
     sentence += '?'  unless sentence[-1] == '.'
     sentence = fixit(sentence)
-    accepted << sentence  if sentence.size > 15 && sentence.size <= 140
+    accepted << sentence  if sentence.size > 15 && sentence.size <= 140 && !sentence.match(characters)
     more_rejects << sentence  if sentence.size > 140
   end
 end
@@ -71,12 +73,16 @@ rejected = more_rejects
 DB = Sequel.connect("mysql2://#{DB_USER}:#{DB_PASSWORD}@localhost/stungeye")
 sentences = DB[:sentences]
 
-open('sentences.txt', 'w:UTF-8') do |file|
-  accepted.each do |sentence|
-    # file.puts "#{sentence} (#{sentence.size})"
-    sentences.insert( :words => sentence, :length => sentence.size )
-  end
-end
+#open('sentences.txt', 'w:UTF-8') do |file|
+  #accepted.each do |sentence|
+    #file.puts "#{sentence} (#{sentence.size})"
+  #end
+#end
+
+ accepted.each do |sentence|
+   sentences.insert( :words => sentence, :length => sentence.size )
+ end
+
 
 puts "Accepted: #{accepted.size}"
 puts "Rejected: #{rejected.size}"
